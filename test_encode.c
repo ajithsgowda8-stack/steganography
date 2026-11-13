@@ -1,29 +1,70 @@
 #include <stdio.h>
+#include "decode.h"
 #include "encode.h"
 #include "types.h"
-OperationType check_operation(char opt);
-int main(int argc,char*argv[])
+
+//-------------------------------------------------------------------------------//
+
+int main(int argc,char *argv[])
 {
-    EncodeInfo encInfo;
-    if(argc<4)
+   //check e or d from argv[1][1]
+    if(argc>=3 && check_operation_type(argv[1][1])==e_encode)
     {
-        printf("Usage: %s -e <beatiful.bmp> <secret.txt>[output.bmp]",argv[0]);
-        
-    }
-    else{
-        if(check_operation(argv[1][1])==e_encode)
+        EncodeInfo encInfo;
+        if(read_and_validate_encode_args(argv, &encInfo)==e_failure)
         {
-            read_and_validate_encode_args(argv,&encInfo);
+            printf("\n-------- SAMPLE INPUTS --------\n");
+            printf("\n./a.out -e source_file.bmp secret_file.txt [output_file.bmp]\n");
+            printf("./a.out -d source_file.bmp [output_file(.bmp .py .txt )]\n");
+            printf("\n");
+            return 0;
         }
-        
+        if(do_encoding(&encInfo)==e_failure)
+        {
+            printf("\nERROR : Unable to encode\n");
+            return 0;
+        }
+       printf("\nEncoding Completed.\n");
+       printf("\n");
+       return 0;
     }
-    if(read_and_validate_encode_args(argv,&encInfo)==e_success)
+    else if(argc>=2 && check_operation_type(argv[1][1])==e_decode)
+    { 
+        DecodeInfo decInfo;
+        if(read_and_validate_decode_args(argv, &decInfo)==e_failure)
+        {
+            //printf("\nInvalid input..\n");
+            printf("\n-------- SAMPLE INPUTS --------\n");
+            printf("\n./a.out -e source_file.bmp secret_file.txt [output_file.bmp]\n");
+            printf("./a.out -d source_file.bmp [output_file(.bmp .py .txt)]\n");
+            printf("\n");
+            return 0;
+        }
+        if(do_decoding(&decInfo)==e_failure)
+        {
+            printf("\nERROR : Unable to decode\n");
+            return 0;
+        }
+       printf("\nDecoding Completed.\n");
+       printf("\n");
+       return 0;
+    }
+    else
     {
-        if(do_encoding(&encInfo)==e_success)
+        printf("\nInvalid input\n");
+        printf("\n-------- SAMPLE INPUTS --------\n");
+            printf("\n./a.out -e source_file.bmp secret_file.txt [output_file.bmp]\n");
+            printf("./a.out -d source_file.bmp [output_file(.bmp .py .txt)]\n");
+            printf("\n");
+        return 0;
     }
+
     return 0;
 }
-OperationType check_operation(char opt)
+
+//-------------------------------------------------------------------------------//
+
+OperationType check_operation_type(char opt)
 {
     if(opt=='e')
     {
@@ -35,30 +76,8 @@ OperationType check_operation(char opt)
     }
     else
     {
-        printf("enter e or d\n");
         return e_unsupported;
     }
-} 
-    // uint img_size;
+}
 
-    // // Fill with sample filenames
-    // encInfo.src_image_fname = "beautiful.bmp";
-    // encInfo.secret_fname = "secret.txt";
-    // encInfo.stego_image_fname = "stego_img.bmp";
-
-    // // Test open_files
-    // if (open_files(&encInfo) == e_failure)
-    // {
-    // 	printf("ERROR: %s function failed\n", "open_files" );
-    // 	return 1;
-    // }
-    // else
-    // {
-    // 	printf("SUCCESS: %s function completed\n", "open_files" );
-    // }
-
-    // // Test get_image_size_for_bmp
-    // img_size = get_image_size_for_bmp(encInfo.fptr_src_image);
-    // printf("INFO: Image size = %u\n", img_size);
-
- 
+//-------------------------------------------------------------------------------//
